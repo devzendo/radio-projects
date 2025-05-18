@@ -16,18 +16,39 @@ feeder_length = border + (gap/2) + 31.75;
 enclosure_length = feeder_length + 10 + 15.31;
 anti_gap = (piece_width/2)-(gap/2);
 enclosure_height = 15 + border;
-bnc_width = 9.5;
+bnc_width = 9.5; // circluar threaded part
+bnc_nut_max_width = 14.5;
+// diameter of a cylinder around the bnc, giving enough space for the nut, and for it to be turned.
+bnc_nut_cylinder = bnc_nut_max_width + 6 + wall;
+// how much space should we give for bnc soldering?
+bnc_nut_cylinder_length = 20 + wall;
 
 union() {
     difference() {
         difference() {
-            // The enclosure box.
-            color("blue")
-                cube([piece_width, enclosure_length, enclosure_height]);
-            color("red")
-            // With the space inside removed.
-                translate([wall, wall, 0])
-                cube([piece_width - (2*wall), enclosure_length - (2*wall), enclosure_height - wall]);
+            
+            union() {
+                // The enclosure box.
+                color("blue")
+                    cube([piece_width, enclosure_length, enclosure_height]);
+                // cylinder in which the bnc can easily be fitted, with a few mil extra for tooling
+                color("green")
+                    rotate([-90, 0, 0])
+                    translate([(piece_width/2), -(enclosure_height/2), enclosure_length - bnc_nut_cylinder_length])
+                    cylinder(h=bnc_nut_cylinder_length, r=bnc_nut_cylinder/2, center=false, $fn = 360);
+            }
+            union() {
+                // With the space inside removed.
+                color("red")
+                    translate([wall, wall, 0])
+                    cube([piece_width - (2*wall), enclosure_length - (2*wall), enclosure_height - wall]);
+                // the inside of the bnc cylinder is removed
+                color("red")
+                    rotate([-90, 0, 0])
+                    translate([(piece_width/2), -(enclosure_height/2), enclosure_length - bnc_nut_cylinder_length])
+                    cylinder(h=bnc_nut_cylinder_length - wall, r=(bnc_nut_cylinder/2) - wall, center=false, $fn = 360);
+
+            }
         }
         
         union() {
