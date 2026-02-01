@@ -69,6 +69,7 @@ e_total_height = e_thickness + e_h_height + e_b_height + e_thickness + e_thickne
 nut_flat = 5.4;
 nut_point_to_point = 6.16;
 nut_hole = 2.95;
+nut_height = 2.4;
 mnt_margin = 2;
 
 // Modules
@@ -85,7 +86,11 @@ module screw_mounting() {
             // screw thread
             color("yellow")
             translate([(mnt_margin + nut_point_to_point + mnt_margin)/2, (mnt_margin + nut_flat + mnt_margin)/2, 0])
-            cylinder($fa=1, h=e_thickness*2, r=nut_hole/2, center=true, $fn = 360);
+                cylinder($fa=1, h=e_thickness*2, r=nut_hole/2, center=true, $fn = 360);
+            // nut
+            color("blue")
+            translate([(mnt_margin + nut_point_to_point + mnt_margin)/2, (mnt_margin + nut_flat + mnt_margin)/2, e_thickness - nut_height])
+                cylinder(h=nut_height, d=nut_flat/cos(30), $fn=6);
         }
     }
 
