@@ -65,7 +65,32 @@ c_diameter = 15.25; // N-Type
 // screw fixings, and the lid itself.
 e_total_height = e_thickness + e_h_height + e_b_height + e_thickness + e_thickness;
 
+// M3 Nut/Screw mountings
+nut_flat = 5.4;
+nut_point_to_point = 6.16;
+nut_hole = 2.95;
+mnt_margin = 2;
+
 // Modules
+
+module screw_mounting() {
+    difference() {
+        // mounting bracket
+        color("red")
+        cube([mnt_margin + nut_point_to_point + mnt_margin, 
+            mnt_margin + nut_flat + mnt_margin,
+            e_thickness
+        ]);
+        union() {
+            // screw thread
+            color("yellow")
+            translate([(mnt_margin + nut_point_to_point + mnt_margin)/2, (mnt_margin + nut_flat + mnt_margin)/2, 0])
+            cylinder($fa=1, h=e_thickness*2, r=nut_hole/2, center=true, $fn = 360);
+        }
+    }
+
+}
+
 // The whole enclosure:
 module enclosure_body() {
     difference() {
@@ -148,6 +173,18 @@ module enclosure_body() {
                 h_screen_plus_pcb + 2
             ]);
     }
+    
+    // The screw mountings
+    translate([e_thickness, 1, e_total_height - (2 * e_thickness)])
+    screw_mounting();
+    translate([e_thickness, e_ext_h_width - 1 - (mnt_margin * 2 + nut_flat), e_total_height - (2 * e_thickness)])
+    screw_mounting();
+    translate([e_ext_length - e_thickness - (mnt_margin + nut_point_to_point + mnt_margin), 1, e_total_height - (2 * e_thickness)])
+    screw_mounting();
+    translate([e_ext_length - e_thickness - (mnt_margin + nut_point_to_point + mnt_margin), e_ext_h_width - 1 - (mnt_margin * 2 + nut_flat), e_total_height - (2 * e_thickness)])
+    screw_mounting();
+    
+    
 }
 
 module heltec_cutouts() {
