@@ -299,4 +299,7 @@ module battery_holder() {
 
 // Render
 main_enclosure();
+
+rotate([0, 90, 0])
+translate([-47, 0, 0])
 battery_holder();
