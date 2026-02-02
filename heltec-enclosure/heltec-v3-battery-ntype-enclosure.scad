@@ -263,13 +263,40 @@ module main_enclosure() {
     difference() {
         enclosure_body();
         heltec_cutouts();
-//        display_cutout();
-//        button_holes();
-//        usb_cutout();
-//        n_type_connector_hole();
+    }
+}
+
+module battery_holder() {
+    y_offset = e_ext_h_width + 10;
+    bh_length = 47;
+    bh_height = e_ext_h_width - (2*e_thickness) + 2;
+    mounting_gap = 2;
+    // bottom short part
+    translate([20, y_offset, 0])
+        cube([27, 2, bh_height]);
+    // vertical part
+    translate([45, y_offset + 2, 0])
+        cube([2, 8, bh_height]);
+    // top long part with screw mountings cut out
+    difference() {
+        translate([0, y_offset + 10, 0])
+            cube([bh_length, 2, bh_height]);
+        color("red")
+        // two cutouts
+        union() {
+            translate([0, y_offset + 10, 0])
+                cube([mnt_margin + nut_point_to_point + mnt_margin + mounting_gap,
+                    2,
+                    mnt_margin + nut_flat + mnt_margin + mounting_gap]);
+            translate([0, y_offset + 10, bh_height - (mnt_margin + nut_flat + mnt_margin + mounting_gap)])
+                cube([mnt_margin + nut_point_to_point + mnt_margin + mounting_gap,
+                    2,
+                    mnt_margin + nut_flat + mnt_margin + mounting_gap]);
+        }        
     }
 }
 
 
 // Render
 main_enclosure();
+battery_holder();
