@@ -48,6 +48,15 @@ midpoint_y = e_ext_h_width / 2;
 // battery holder. How high is the Heltec bottom compartment?
 e_h_height = h_total_height;
 
+
+// Buttons
+but_x = 3.45; // centre point of buttons from LHS of board (seems too low; too left?)
+but_y = 3.45; // distance of centre point of buttons from edge of board (guessed)
+top_but_y = e_thickness + e_h_width_wiggle + h_width - but_y;
+bot_but_y = e_thickness + e_h_width_wiggle + but_y;
+
+
+
 // The battery dimensions (b_)
 b_length = 43;
 b_width = 30;
@@ -55,6 +64,11 @@ b_thick = 8;
 // Battery holder is made of 2mm thick panels.
 e_b_panel_thick = 2;
 e_b_height = e_b_panel_thick + b_thick + e_b_panel_thick;
+
+// Battery holder
+bh_length = 47;
+bh_height = e_ext_h_width - (2*e_thickness) + 2;
+
 
 // Connector (c_) (N-Type, SMA)
 c_diameter = 15.25; // N-Type
@@ -71,6 +85,10 @@ nut_point_to_point = 6.16;
 nut_hole = 2.95;
 nut_height = 2.4;
 mnt_margin = 2;
+head_diameter = 6.0; // countersunk head diameter (top)
+head_height = 1.65;  // countersunk head height
+screw_length = 6;
+shaft_length = screw_length - head_height;
 
 // Modules
 
@@ -193,11 +211,6 @@ module enclosure_body() {
 }
 
 module heltec_cutouts() {
-    // Buttons
-    but_x = 3.45; // centre point of buttons from LHS of board (seems too low; too left?)
-    but_y = 3.45; // distance of centre point of buttons from edge of board (guessed)
-    top_but_y = e_thickness + e_h_width_wiggle + h_width - but_y;
-    bot_but_y = e_thickness + e_h_width_wiggle + but_y;
     color("black")
     union() {
         // Display cutout
@@ -268,8 +281,6 @@ module main_enclosure() {
 
 module battery_holder() {
     y_offset = e_ext_h_width + 10;
-    bh_length = 47;
-    bh_height = e_ext_h_width - (2*e_thickness) + 2;
     mounting_gap = 2;
     // bottom short part
     translate([20, y_offset, 0])
@@ -296,10 +307,87 @@ module battery_holder() {
     }
 }
 
+module buttons() {
+    y_offset = e_ext_h_width + 10;
+    x_offset = e_ext_h_width - (2*e_thickness) + 2 + 20; // 20mm from the battery
+    
+    wiggle = 0.2;
+    sep = top_but_y - bot_but_y;
+    
+    // Top button thick restraint
+    translate([x_offset, y_offset, e_thickness/4])
+        cylinder($fa=1, h=e_thickness/2, r=3 - wiggle, center=true, $fn = 360);
+
+    // Top button button hole
+    translate([x_offset, y_offset, e_thickness + (e_thickness/2)])
+        cylinder($fa=1, h=e_thickness*2, r=2 - wiggle, center=true, $fn = 360);
+    
+    // Bottom button thick restraint
+    translate([x_offset + sep, y_offset, e_thickness/4])
+        cylinder($fa=1, h=e_thickness/2, r=3 - wiggle, center=true, $fn = 360);
+
+    // Bottom button button hole
+    translate([x_offset + sep, y_offset, e_thickness + (e_thickness/2)])
+        cylinder($fa=1, h=e_thickness*2, r=2 - wiggle, center=true, $fn = 360);
+        
+    // Connecting strip (omit for now)
+//    translate([x_offset, y_offset, 0])
+//        cube([sep, 3 - wiggle, 1]);
+}
+
+module countersunk_screw() {
+    color("yellow")
+    translate([(mnt_margin + nut_point_to_point + mnt_margin)/2, (mnt_margin + nut_flat + mnt_margin)/2, 0])
+    union() {
+        // Conical countersunk head
+        cylinder(h=head_height, d1=head_diameter, d2=nut_hole, $fn=30);
+    
+        // Cylindrical shaft
+        translate([0, 0, e_thickness])
+            cylinder($fa=1, h=e_thickness*2, r=nut_hole/2, center=true, $fn = 360);
+    }
+}
+
+module lid() {
+    y_offset = e_ext_h_width + 30;
+    restraint_length = 10;
+    color("blue")
+    difference() {
+        union () {
+            // lid plate
+            translate([e_thickness, y_offset, 0])
+                cube([e_ext_length - (2*e_thickness), e_ext_h_width - 2, e_thickness]);
+            // battery holder restraint
+            translate([e_thickness + bh_length - (restraint_length / 2), y_offset, e_thickness])
+                cube([restraint_length, e_ext_h_width - 2, e_thickness]);
+            translate([e_thickness + bh_length, y_offset, e_thickness * 2])
+                cube([restraint_length / 2, e_ext_h_width - 2, e_thickness]);
+        }
+
+        // countersunk screws
+        union() {
+            translate([e_thickness, y_offset + 1, 0])
+                countersunk_screw();
+            translate([e_thickness, y_offset + e_ext_h_width - 1 - (mnt_margin * 2 + nut_flat), 0])
+                countersunk_screw();
+            translate([e_ext_length - e_thickness - (mnt_margin + nut_point_to_point + mnt_margin), y_offset + 1, 0])
+                countersunk_screw();
+        translate([e_ext_length - e_thickness - (mnt_margin + nut_point_to_point + mnt_margin), y_offset + e_ext_h_width - 1 - (mnt_margin * 2 + nut_flat), 0])
+                countersunk_screw();
+
+        }
+    }
+}
 
 // Render
+
 main_enclosure();
 
 rotate([0, 90, 0])
 translate([-47, 0, 0])
 battery_holder();
+
+buttons();
+
+lid();
+
