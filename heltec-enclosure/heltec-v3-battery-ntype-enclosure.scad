@@ -92,6 +92,31 @@ shaft_length = screw_length - head_height;
 
 // Modules
 
+// From https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Primitive_Solids
+module prism(l, w, h) {
+    polyhedron(// pt      0        1        2        3        4        5
+               points=[[0,0,0], [0,w,h], [l,w,h], [l,0,0], [0,w,0], [l,w,0]],
+               // top sloping face (A)
+               faces=[[0,1,2,3],
+               // vertical rectangular face (B)
+               [2,1,4,5],
+               // bottom face (C)
+               [0,3,5,4],
+               // rear triangular face (D)
+               [0,4,1],
+               // front triangular face (E)
+               [3,2,5]]
+               );}
+               
+module screw_mounting_support() {
+    // triangular prism support underneath
+    color("green")
+    rotate([0, 180, 0])
+    prism(mnt_margin + nut_flat + mnt_margin,
+            mnt_margin + nut_point_to_point + mnt_margin,
+            e_thickness);
+}
+
 module screw_mounting() {
     difference() {
         // mounting bracket
@@ -206,13 +231,38 @@ module enclosure_body() {
     
     // The screw mountings
     translate([e_thickness, 1, e_total_height - (2 * e_thickness)])
-    screw_mounting();
-    translate([e_thickness, e_ext_h_width - 1 - (mnt_margin * 2 + nut_flat), e_total_height - (2 * e_thickness)])
-    screw_mounting();
+        union() {
+            screw_mounting();
+            // BODGEROOO!
+            translate([mnt_margin + nut_point_to_point + mnt_margin, 9.4, 0])
+            rotate([0, 0, 90])
+            screw_mounting_support();
+        }
+    translate([e_thickness, e_ext_h_width - 1 - (mnt_margin * 2 + nut_flat),            e_total_height - (2 * e_thickness)])
+        union() {
+            screw_mounting();
+            // BODGEROOO!
+            translate([mnt_margin + nut_point_to_point + mnt_margin, 9.4, 0])
+            rotate([0, 0, 90])
+            screw_mounting_support();
+        }
     translate([e_ext_length - e_thickness - (mnt_margin + nut_point_to_point + mnt_margin), 1, e_total_height - (2 * e_thickness)])
-    screw_mounting();
+        union() {
+            screw_mounting();
+            // BODGEROOO!
+            translate([mnt_margin + nut_point_to_point + mnt_margin - 10.16, 0, 0])
+            rotate([0, 0, -90])
+            screw_mounting_support();
+        }
+        
     translate([e_ext_length - e_thickness - (mnt_margin + nut_point_to_point + mnt_margin), e_ext_h_width - 1 - (mnt_margin * 2 + nut_flat), e_total_height - (2 * e_thickness)])
-    screw_mounting();
+        union() {
+            screw_mounting();
+            // BODGEROOO!
+            translate([mnt_margin + nut_point_to_point + mnt_margin - 10.16, 0, 0])
+            rotate([0, 0, -90])
+            screw_mounting_support();
+        }
 }
 
 module heltec_cutouts() {
@@ -386,13 +436,14 @@ module lid() {
 
         // countersunk screws
         union() {
+            far_y_bodge = 2; // don't know why this is needed
             translate([e_thickness, y_offset + 1, 0])
                 countersunk_screw();
-            translate([e_thickness, y_offset + e_ext_h_width - 1 - (mnt_margin * 2 + nut_flat), 0])
+            translate([e_thickness, y_offset + e_ext_h_width - 1 - (mnt_margin * 2 + nut_flat) - far_y_bodge, 0])
                 countersunk_screw();
             translate([e_ext_length - e_thickness - (mnt_margin + nut_point_to_point + mnt_margin), y_offset + 1, 0])
                 countersunk_screw();
-        translate([e_ext_length - e_thickness - (mnt_margin + nut_point_to_point + mnt_margin), y_offset + e_ext_h_width - 1 - (mnt_margin * 2 + nut_flat), 0])
+        translate([e_ext_length - e_thickness - (mnt_margin + nut_point_to_point + mnt_margin), y_offset + e_ext_h_width - 1 - (mnt_margin * 2 + nut_flat) - far_y_bodge, 0])
                 countersunk_screw();
 
         }
