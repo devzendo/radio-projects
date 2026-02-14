@@ -71,7 +71,7 @@ bh_height = e_ext_h_width - (2*e_thickness) + 2;
 
 
 // Connector (c_) (N-Type, SMA)
-c_diameter = 15.25; // N-Type
+c_diameter = 15.75; // N-Type
 //c_diameter = 6; // SMA (need to measure this)
 // If you want SMA, comment out the 'flat bits'
 
@@ -154,9 +154,10 @@ module enclosure_body() {
                 cylinder($fa=1, h=e_thickness*2, r=c_diameter/2, center=true, $fn = 360);
             }
     }
-    // The flat bits for the connector
+    // The flat bits for the antenna connector
     c_flat_bit_height = 1.16;
-    translate([e_ext_length - (e_thickness), (e_ext_h_width / 2) - (c_diameter / 2), (e_total_height / 2) + (c_diameter / 2) - c_flat_bit_height])
+    c_flat_bit_z_wiggle = 0.5;
+    translate([e_ext_length - (e_thickness), (e_ext_h_width / 2) - (c_diameter / 2), (e_total_height / 2) + (c_diameter / 2) - c_flat_bit_height + c_flat_bit_z_wiggle])
         color("black")
         cube([e_thickness, 
               c_diameter,
