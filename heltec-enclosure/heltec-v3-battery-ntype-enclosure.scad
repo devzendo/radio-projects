@@ -165,9 +165,9 @@ module enclosure_body() {
         ]);
     
     // The hook / barb that holds the board in place near the IPEX antenna connector.
-    hk_length = 1.5;
+    hk_length = 2.0;
     hk_width = 4;
-    barb_length = 1;
+    barb_length = 0.5;
     // 3 roughly how much space away from the midpoint of the IPEX
     ipex_gap = 3;
     // A cube with a 45 degree rotated cube removed, for the hook.
@@ -190,13 +190,19 @@ module enclosure_body() {
         }
         // take off a triangular prism
         color("red")
-        translate([e_thickness + h_length + h_ant_end_length - 5, midpoint_y + ipex_gap, e_thickness + h_screen_plus_pcb + 3])
-            rotate([0, 45, 0])
+        translate([e_thickness + h_length + h_ant_end_length - 5, midpoint_y + ipex_gap, e_thickness + h_screen_plus_pcb + 1.5])
+            rotate([0, 30, 0])
             cube([hk_length + 2.5,
                 hk_width,
                 h_screen_plus_pcb + 2
             ]);
     }
+    // A 'wall' that holds the board end (where the IPEX connector is) in place.
+    wa_width = 10.5;
+    wa_length = e_thickness - 1;
+    wa_height = h_screen_plus_pcb + 0.5; // just taller than PCB
+    translate([e_thickness + h_length + h_ant_end_length, (midpoint_y/2)+(wa_width/2), e_thickness])
+        cube([wa_length, wa_width, wa_height]);
     
     // The screw mountings
     translate([e_thickness, 1, e_total_height - (2 * e_thickness)])
@@ -207,8 +213,6 @@ module enclosure_body() {
     screw_mounting();
     translate([e_ext_length - e_thickness - (mnt_margin + nut_point_to_point + mnt_margin), e_ext_h_width - 1 - (mnt_margin * 2 + nut_flat), e_total_height - (2 * e_thickness)])
     screw_mounting();
-    
-    
 }
 
 module heltec_cutouts() {
@@ -391,4 +395,3 @@ battery_holder();
 buttons();
 
 lid();
-
