@@ -335,16 +335,16 @@ module buttons() {
     sep = top_but_y - bot_but_y;
     
     // Top button thick restraint
-    translate([x_offset, y_offset, e_thickness/4])
-        cylinder($fa=1, h=e_thickness/2, r=3 - wiggle, center=true, $fn = 360);
+    translate([x_offset, y_offset, e_thickness/2])
+        cylinder($fa=1, h=e_thickness, r=3 - wiggle, center=true, $fn = 360);
 
     // Top button button hole
     translate([x_offset, y_offset, e_thickness + (e_thickness/2)])
         cylinder($fa=1, h=e_thickness*2, r=2 - wiggle, center=true, $fn = 360);
     
     // Bottom button thick restraint
-    translate([x_offset + sep, y_offset, e_thickness/4])
-        cylinder($fa=1, h=e_thickness/2, r=3 - wiggle, center=true, $fn = 360);
+    translate([x_offset + sep, y_offset, e_thickness/2])
+        cylinder($fa=1, h=e_thickness, r=3 - wiggle, center=true, $fn = 360);
 
     // Bottom button button hole
     translate([x_offset + sep, y_offset, e_thickness + (e_thickness/2)])
