@@ -216,7 +216,7 @@ module enclosure_body() {
 }
 
 module heltec_cutouts() {
-    color("black")
+    color("red")
     union() {
         // Display cutout
         left_display = (h_length - h_ant_end_length - h_margin - h_visible_screen_length);
@@ -250,7 +250,22 @@ module heltec_cutouts() {
                   e_ext_h_width - (2*e_thickness),
                   h_screen_plus_pcb
         ]);
-        
+        // Component cutout on the right hand side of the power connector
+        comp_y_offset = 16.5; // measured
+        comp_width = 7; // measured
+        comp_height = 2; // just to make sure
+        translate([board_x, e_thickness + e_h_width_wiggle + comp_y_offset, e_thickness + h_screen_plus_pcb])
+            cube([e_thickness - board_x, comp_width, comp_height]);
+
+        // LEDs
+        led_x = 8.2; // measured
+        led_1_y = 3.1; // measured
+        led_2_y = 5.5; // measured
+        translate([board_x + led_x, e_thickness + e_h_width_wiggle + led_1_y, e_thickness/2])
+            cylinder($fa=1, h=e_thickness, r=0.75, center=true, $fn=360);
+        translate([board_x + led_x, e_thickness + e_h_width_wiggle + led_2_y, e_thickness/2])
+            cylinder($fa=1, h=e_thickness, r=0.75, center=true, $fn=360);
+            
         // The WiFi/BLE antenna (diam. 4mm) needs a bit of space. 
         translate([e_thickness + 11.5, bot_but_y + 1, e_thickness - ((e_thickness/4))])
             cylinder($fa=1, h=e_thickness/1.3, r=3.25, center=true, $fn = 360);
