@@ -26,8 +26,11 @@ h_ant_end_length = 2.24; // length of the 'bay window' with the IPEX connector
 h_margin = 3; // the width of the unused strip at the edge of the screen
 h_visible_screen_length = 27.28; // DS
 h_display_width = 18.56; // DS
+h_display_visible_width = 13.69;
 h_screen = 5; // DS
 h_screen_plus_pcb = h_screen + 1.64; // DS plus measured
+// board_x here is the position of the cutout for the board / USBC
+board_x = 1;
 
 
 // Enclosure dimensions (e_).
@@ -41,7 +44,7 @@ e_thickness = 3;
 e_ext_length = e_thickness + h_length + pigtail_gap + e_thickness;
 // At the base, where the Heltec mounts...
 // Give a little room either side of the board
-e_h_width_wiggle = 1;
+e_h_width_wiggle = 0.1;
 e_ext_h_width = e_thickness + e_h_width_wiggle + h_width + e_h_width_wiggle + e_thickness;
 midpoint_y = e_ext_h_width / 2;
 // Above the Heltec the walls thin out by 1mm to ledge the
@@ -201,13 +204,13 @@ module enclosure_body() {
         // vertical and cube
         union() {
             // vertical
-            translate([e_thickness + h_length + h_ant_end_length, midpoint_y + ipex_gap, e_thickness])
+            translate([board_x + h_length + h_ant_end_length, midpoint_y + ipex_gap, e_thickness])
             cube([hk_length, 
                 hk_width,
                 h_screen_plus_pcb + 4
             ]);
             // cube
-            translate([e_thickness + h_length + h_ant_end_length - barb_length, midpoint_y + ipex_gap, e_thickness + h_screen_plus_pcb])
+            translate([board_x + h_length + h_ant_end_length - barb_length, midpoint_y + ipex_gap, e_thickness + h_screen_plus_pcb])
                 cube([hk_length + barb_length, 
                     hk_width,
                     h_screen_plus_pcb
@@ -215,7 +218,7 @@ module enclosure_body() {
         }
         // take off a triangular prism
         color("red")
-        translate([e_thickness + h_length + h_ant_end_length - 5, midpoint_y + ipex_gap, e_thickness + h_screen_plus_pcb + 1.5])
+        translate([board_x + h_length + h_ant_end_length - 5, midpoint_y + ipex_gap, e_thickness + h_screen_plus_pcb + 1.5])
             rotate([0, 30, 0])
             cube([hk_length + 2.5,
                 hk_width,
@@ -224,9 +227,9 @@ module enclosure_body() {
     }
     // A 'wall' that holds the board end (where the IPEX connector is) in place.
     wa_width = 10.5;
-    wa_length = e_thickness - 1;
+    wa_length = e_thickness * 2;
     wa_height = h_screen_plus_pcb + 0.5; // just taller than PCB
-    translate([e_thickness + h_length + h_ant_end_length, (midpoint_y/2)+(wa_width/2), e_thickness])
+    translate([board_x + h_length + h_ant_end_length, (midpoint_y/2)+(wa_width/2), e_thickness])
         cube([wa_length, wa_width, wa_height]);
     
     // The screw mountings
@@ -269,12 +272,11 @@ module heltec_cutouts() {
     color("red")
     union() {
         // Display cutout
+        h_y_offset = 3; // it's 'up a bit' from the centre
         left_display = (h_length - h_ant_end_length - h_margin - h_visible_screen_length);
-        // board_x here is the position of the cutout for the board / USBC
-        board_x = 1;
-        translate([board_x + left_display, (e_ext_h_width/2)-(h_display_width/2), 0])
+        translate([board_x + left_display, (e_ext_h_width/2)-(h_display_visible_width/2) - h_y_offset, 0])
             cube([h_visible_screen_length, 
-                  h_display_width,
+                  h_display_visible_width,
                   e_thickness
         ]);
     
@@ -309,8 +311,8 @@ module heltec_cutouts() {
 
         // LEDs
         led_x = 8.2; // measured
-        led_1_y = 3.1; // measured
-        led_2_y = 5.5; // measured
+        led_1_y = 19.74; // measured with a bodge
+        led_2_y = 22.3; // measured with a bodge
         translate([board_x + led_x, e_thickness + e_h_width_wiggle + led_1_y, e_thickness/2])
             cylinder($fa=1, h=e_thickness, r=0.75, center=true, $fn=360);
         translate([board_x + led_x, e_thickness + e_h_width_wiggle + led_2_y, e_thickness/2])
@@ -321,8 +323,9 @@ module heltec_cutouts() {
             cylinder($fa=1, h=e_thickness/1.3, r=3.25, center=true, $fn = 360);
 
         // USB-C https://fyozdiwwu.blob.core.windows.net/dimensions-of-usb-connector.html
-        u_width = 8.34;
-        u_height = 3.16;
+        // Slightly taller, less wide.
+        u_width = 8.0;
+        u_height = 3.2;
 
         translate([0, midpoint_y - (u_width / 2), e_thickness + h_screen - (u_height / 2)])
             rotate([0, 90, 0])
@@ -430,8 +433,8 @@ module lid() {
             // battery holder restraint
             translate([e_thickness + bh_length - (restraint_length / 2), y_offset, e_thickness])
                 cube([restraint_length, e_ext_h_width - 2, e_thickness]);
-            translate([e_thickness + bh_length, y_offset, e_thickness * 2])
-                cube([restraint_length / 2, e_ext_h_width - 2, e_thickness]);
+            translate([e_thickness + bh_length, y_offset + 2, e_thickness * 2])
+                cube([restraint_length / 2, e_ext_h_width - 6, e_thickness]);
         }
 
         // countersunk screws
